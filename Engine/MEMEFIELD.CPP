@@ -14,8 +14,10 @@ bool MemeField::Tile::HasMeme()
     return hasMeme;
 }
 
-void MemeField::Tile::Draw(Vei2 screenPos, Graphics& gfx) const
+void MemeField::Tile::Draw(Vei2 screenPos, bool Clowned, Graphics& gfx) const
 {
+    if (!Clowned) {
+
     switch (state)
     {
     case State::Hidden:
@@ -32,9 +34,40 @@ void MemeField::Tile::Draw(Vei2 screenPos, Graphics& gfx) const
         }
         else {
             SpriteCodex::DrawTileBomb(screenPos, gfx);
-        }
+        }    };
+    }    else {
+        switch (state)
+        {
+        case State::Hidden:
+            if (hasMeme) {
+                SpriteCodex::DrawTileBomb(screenPos, gfx);
+            }
+            else {
+            SpriteCodex::DrawTileButton(screenPos, gfx);
 
-    };
+            }
+            break;
+
+        case State::Flagged:
+            if (hasMeme) {
+                SpriteCodex::DrawTileBomb(screenPos, gfx);
+                SpriteCodex::DrawTileFlag(screenPos, gfx);
+            }
+            else {
+                SpriteCodex::DrawTileBomb(screenPos, gfx);
+                SpriteCodex::DrawTileCross(screenPos, gfx);
+            }
+            break;
+        case State::Revealed:
+            if (!hasMeme) {
+                SpriteCodex::DrawTile(screenPos, nNeighbourMemes, gfx);
+            }
+            else {
+                SpriteCodex::DrawTileBombRed(screenPos, gfx);
+            }
+
+        };
+    }
 }
 
 void MemeField::Tile::Reveal()
@@ -100,13 +133,15 @@ void MemeField::Draw(Graphics& gfx) const
     for (Vei2 gridPos = { 0,0 }; gridPos.y < height; gridPos.y++)
     {
         for (gridPos.x=0; gridPos.x < width; gridPos.x++) {
-            TileAt(gridPos).Draw(gridPos * SpriteCodex::tileSize, gfx);
+            TileAt(gridPos).Draw(gridPos * SpriteCodex::tileSize, gotClowned, gfx);
         }
     }
 }
 
 void MemeField::onRevealClick(const Vei2& screenPos)
 {
+    if (!gotClowned) {
+
     Vei2 gridPos = ScreenToGrid(screenPos);
     assert(gridPos.x >= 0 && gridPos.x < width&& gridPos.y>=0 && gridPos.y < height);
     
@@ -114,11 +149,17 @@ void MemeField::onRevealClick(const Vei2& screenPos)
     if (!tile.isRevealed() && !tile.isFlagged())
     {
         tile.Reveal();
+        if (tile.HasMeme()) {
+            gotClowned = true;
+        }
+    }
     }
 }
 
 void MemeField::onFlagClick(const Vei2& screenPos)
 {
+    if (!gotClowned) {
+
     Vei2 gridPos = ScreenToGrid(screenPos);
     assert(gridPos.x >= 0 && gridPos.x < width&& gridPos.y >= 0 && gridPos.y < height);
 
@@ -126,6 +167,7 @@ void MemeField::onFlagClick(const Vei2& screenPos)
     if (!tile.isRevealed()) {
     tile.ToggleFlag();
 
+    }
     }
 }
 

@@ -14,7 +14,7 @@ private:
 	public:
 		void SpawnMeme();
 		bool HasMeme();
-		void Draw(Vei2 screenPos, Graphics& gfx) const;
+		void Draw(Vei2 screenPos,bool Clowned, Graphics& gfx) const;
 		void Reveal();
 		bool isRevealed() const;
 		void ToggleFlag();
@@ -40,4 +40,5 @@ private:
 	static constexpr int width = 20;
 	static constexpr int height = 16;
 	Tile field[width * height];
+	bool gotClowned = false;
 };
