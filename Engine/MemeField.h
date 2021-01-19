@@ -5,6 +5,8 @@
 
 class MemeField
 {
+public:
+	enum class State { ded, won, memeing };
 private:
 	class Tile
 	{
@@ -18,7 +20,7 @@ private:
 	public:
 		void SpawnMeme();
 		bool HasMeme() const;
-		void Draw( const Vei2& screenPos,bool fucked,Graphics& gfx ) const;
+		void Draw( const Vei2& screenPos,MemeField::State gameState,Graphics& gfx ) const;
 		void Reveal();
 		bool IsRevealed() const;
 		void ToggleFlag();
@@ -43,12 +45,12 @@ private:
 	int CountNeighborMemes( const Vei2& gridPos );
 	
 private:
+	
 	static constexpr int width = 4;
 	static constexpr int height = 4;
 	static constexpr int thickness =10;
 	static constexpr Color c = {255,200,200};
-	bool isFucked = false;
-	bool gameWin = false;
+	State state = State::memeing;
 	Tile field[width * height];
 	Vei2 topLeft;
 	Sound LostSound = Sound(L"spayed.wav");

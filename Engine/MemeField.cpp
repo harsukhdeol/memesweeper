@@ -16,9 +16,9 @@ bool MemeField::Tile::HasMeme() const
 	return hasMeme;
 }
 
-void MemeField::Tile::Draw( const Vei2& screenPos,bool fucked,Graphics& gfx ) const
+void MemeField::Tile::Draw( const Vei2& screenPos, MemeField::State gameState,Graphics& gfx ) const
 {
-	if( !fucked )
+	if(gameState == MemeField::State::memeing)
 	{
 		switch( state )
 		{
@@ -154,10 +154,10 @@ void MemeField::Draw( Graphics& gfx ) const
 	{
 		for( gridPos.x = 0; gridPos.x < width; gridPos.x++ )
 		{
-			TileAt( gridPos ).Draw( topLeft+gridPos * SpriteCodex::tileSize,isFucked,gfx );
+			TileAt( gridPos ).Draw( topLeft+gridPos * SpriteCodex::tileSize,state ,gfx );
 		}
 	}
-	if (GameWon()) {
+	if (state==State::won) {
 		SpriteCodex::DrawWin(gfx.GetRect().GetCenter(), gfx);
 	}
 }
@@ -169,7 +169,7 @@ RectI MemeField::GetRect() const
 
 void MemeField::OnRevealClick( const Vei2& screenPos )
 {
-	if( !isFucked )
+	if( state== State::memeing )
 	{
 		const Vei2 gridPos = ScreenToGrid( screenPos );
 		assert( gridPos.x >= 0 && gridPos.x < width && gridPos.y >= 0 && gridPos.y < height );
@@ -179,8 +179,12 @@ void MemeField::OnRevealClick( const Vei2& screenPos )
 			tile.Reveal();
 			if( tile.HasMeme() )
 			{
-				isFucked = true;
+				state = State::ded;
 				LostSound.Play();
+			}
+			else if (GameWon())
+			{
+				state = State::won;
 			}
 		}
 		
@@ -189,7 +193,7 @@ void MemeField::OnRevealClick( const Vei2& screenPos )
 
 void MemeField::OnFlagClick( const Vei2 & screenPos )
 {
-	if( !isFucked )
+	if(state == State::memeing)
 	{
 		const Vei2 gridPos = ScreenToGrid( screenPos );
 		assert( gridPos.x >= 0 && gridPos.x < width && gridPos.y >= 0 && gridPos.y < height );
