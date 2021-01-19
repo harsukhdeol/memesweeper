@@ -27,11 +27,12 @@ public:
 	MemeField(int nMemes);
 	void Draw(Graphics& gfx) const;
 	void onRevealClick(const Vei2& screenPos);
+	RectI GetRect() const;
 private:
 	Vei2 ScreenToGrid(const Vei2& screenPos)const;
 	Tile& TileAt(const Vei2& gridPos);
 	const Tile& TileAt(const Vei2& gridPos) const; //returns const reference to a tile
-	RectI GetRect() const;
+	
 private:
 	static constexpr int width = 20;
 	static constexpr int height = 16;

@@ -39,6 +39,11 @@ RectI RectI::FromCenter( const Vei2 & center,int halfWidth,int halfHeight )
 	return RectI( center - half,center + half );
 }
 
+bool RectI::ContainsPoint(const Vei2& point) const
+{
+	return point.x>left && point.x<right && point.y>top && point.y<bottom;
+}
+
 RectI RectI::GetExpanded( int offset ) const
 {
 	return RectI( left - offset,right + offset,top - offset,bottom + offset );

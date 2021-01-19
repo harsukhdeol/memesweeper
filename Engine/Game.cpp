@@ -41,7 +41,11 @@ void Game::UpdateModel()
 {
 	if (wnd.mouse.LeftIsPressed())
 	{
-		field.onRevealClick(wnd.mouse.GetPos());
+		const Vei2 mousePos = wnd.mouse.GetPos();
+		if (field.GetRect().ContainsPoint(mousePos)) {
+
+		field.onRevealClick(mousePos);
+		}
 	}
 }
 
