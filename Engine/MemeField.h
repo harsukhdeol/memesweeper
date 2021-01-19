@@ -15,6 +15,10 @@ private:
 		void SpawnMeme();
 		bool HasMeme();
 		void Draw(Vei2 screenPos, Graphics& gfx) const;
+		void Reveal();
+		bool isRevealed() const;
+		void Flag();
+		bool isFlagged() const;
 	private:
 		State state = State::Hidden;
 		bool hasMeme = false;
@@ -22,7 +26,9 @@ private:
 public:
 	MemeField(int nMemes);
 	void Draw(Graphics& gfx) const;
+	void onRevealClick(const Vei2& screenPos);
 private:
+	Vei2 ScreenToGrid(const Vei2& screenPos)const;
 	Tile& TileAt(const Vei2& gridPos);
 	const Tile& TileAt(const Vei2& gridPos) const; //returns const reference to a tile
 	RectI GetRect() const;
