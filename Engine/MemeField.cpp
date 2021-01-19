@@ -116,6 +116,11 @@ void MemeField::Tile::SetNeighborMemeCount( int memeCount )
 	nNeighborMemes = memeCount;
 }
 
+bool MemeField::Tile::HasNoNeighboringMemes() const
+{
+	return nNeighborMemes==0;
+}
+
 MemeField::MemeField( int nMemes, const Vei2& center )
 {
 
@@ -173,21 +178,11 @@ void MemeField::OnRevealClick( const Vei2& screenPos )
 	{
 		const Vei2 gridPos = ScreenToGrid( screenPos );
 		assert( gridPos.x >= 0 && gridPos.x < width && gridPos.y >= 0 && gridPos.y < height );
-		Tile& tile = TileAt( gridPos );
-		if( !tile.IsRevealed() && !tile.IsFlagged() )
+		RevealTile(gridPos);
+		if (GameWon())
 		{
-			tile.Reveal();
-			if( tile.HasMeme() )
-			{
-				state = State::ded;
-				LostSound.Play();
-			}
-			else if (GameWon())
-			{
-				state = State::won;
-			}
+			state = State::won;
 		}
-		
 	}
 }
 
@@ -240,6 +235,36 @@ int MemeField::CountNeighborMemes( const Vei2 & gridPos )
 	}
 
 	return count;
+}
+
+void MemeField::RevealTile(const Vei2& gridPos)
+{
+	const int xStart = std::max(0, gridPos.x - 1);
+	const int yStart = std::max(0, gridPos.y - 1);
+	const int xEnd = std::min(width - 1, gridPos.x + 1);
+	const int yEnd = std::min(height - 1, gridPos.y + 1);
+
+	Tile& tile = TileAt(gridPos);
+	if (!tile.IsRevealed() && !tile.IsFlagged())
+	{
+		tile.Reveal();
+		if (tile.HasMeme())
+		{
+			state = State::ded;
+			LostSound.Play();
+		}
+		
+		else if (tile.HasNoNeighboringMemes())
+		{
+			for (Vei2 gridPos = { xStart,yStart }; gridPos.y <= yEnd; gridPos.y++)
+			{
+				for (gridPos.x = xStart; gridPos.x <= xEnd; gridPos.x++)
+				{
+					RevealTile(gridPos);
+				}
+			}
+		}
+	}
 }
 
 bool MemeField::GameWon() const
