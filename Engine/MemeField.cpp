@@ -118,6 +118,7 @@ void MemeField::Tile::SetNeighborMemeCount( int memeCount )
 
 MemeField::MemeField( int nMemes, const Vei2& center )
 {
+
 	assert( nMemes > 0 && nMemes < width * height );
 	std::random_device rd;
 	std::mt19937 rng( rd() );
