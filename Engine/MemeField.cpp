@@ -116,14 +116,14 @@ void MemeField::Tile::SetNeighborMemeCount( int memeCount )
 	nNeighborMemes = memeCount;
 }
 
-MemeField::MemeField( int nMemes )
+MemeField::MemeField( int nMemes, const Vei2& center )
 {
 	assert( nMemes > 0 && nMemes < width * height );
 	std::random_device rd;
 	std::mt19937 rng( rd() );
 	std::uniform_int_distribution<int> xDist( 0,width - 1 );
 	std::uniform_int_distribution<int> yDist( 0,height - 1 );
-
+	topLeft = Vei2(center - Vei2(width * SpriteCodex::tileSize, height * SpriteCodex::tileSize) / 2);
 	for( int nSpawned = 0; nSpawned < nMemes; ++nSpawned )
 	{
 		Vei2 spawnPos;
@@ -152,14 +152,17 @@ void MemeField::Draw( Graphics& gfx ) const
 	{
 		for( gridPos.x = 0; gridPos.x < width; gridPos.x++ )
 		{
-			TileAt( gridPos ).Draw( gridPos * SpriteCodex::tileSize,isFucked,gfx );
+			TileAt( gridPos ).Draw( topLeft+gridPos * SpriteCodex::tileSize,isFucked,gfx );
 		}
+	}
+	if (gameWin) {
+		SpriteCodex::DrawWin(Vei2(254, 192), gfx);
 	}
 }
 
 RectI MemeField::GetRect() const
 {
-	return RectI( 0,width * SpriteCodex::tileSize,0,height * SpriteCodex::tileSize );
+	return RectI( topLeft,width * SpriteCodex::tileSize,height * SpriteCodex::tileSize );
 }
 
 void MemeField::OnRevealClick( const Vei2& screenPos )
@@ -176,6 +179,20 @@ void MemeField::OnRevealClick( const Vei2& screenPos )
 			{
 				isFucked = true;
 			}
+		}
+		bool continueGame = false;
+		for (Vei2 gridPos = { 0,0 }; gridPos.y < height; gridPos.y++)
+		{
+			for (gridPos.x = 0; gridPos.x < width; gridPos.x++)
+			{
+				if (!TileAt(gridPos).HasMeme())
+				{
+					continueGame = true;
+				}
+			}
+		}
+		if (!continueGame) {
+			gameWin = true;
 		}
 	}
 }
@@ -206,7 +223,7 @@ const MemeField::Tile& MemeField::TileAt( const Vei2 & gridPos ) const
 
 Vei2 MemeField::ScreenToGrid( const Vei2 & screenPos )
 {
-	return screenPos / SpriteCodex::tileSize;
+	return (screenPos-topLeft) / SpriteCodex::tileSize;
 }
 
 int MemeField::CountNeighborMemes( const Vei2 & gridPos )
