@@ -42,6 +42,8 @@ private:
 private:
 	static constexpr int width = 20;
 	static constexpr int height = 16;
+	static constexpr int thickness =10;
+	static constexpr Color c = {255,200,200};
 	bool isFucked = false;
 	bool gameWin = false;
 	Tile field[width * height];

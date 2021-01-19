@@ -147,6 +147,7 @@ MemeField::MemeField( int nMemes, const Vei2& center )
 
 void MemeField::Draw( Graphics& gfx ) const
 {
+	gfx.DrawRect(GetRect().GetExpanded(thickness), c);
 	gfx.DrawRect( GetRect(),SpriteCodex::baseColor );
 	for( Vei2 gridPos = { 0,0 }; gridPos.y < height; gridPos.y++ )
 	{
