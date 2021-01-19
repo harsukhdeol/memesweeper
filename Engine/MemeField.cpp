@@ -156,8 +156,8 @@ void MemeField::Draw( Graphics& gfx ) const
 			TileAt( gridPos ).Draw( topLeft+gridPos * SpriteCodex::tileSize,isFucked,gfx );
 		}
 	}
-	if (gameWin) {
-		SpriteCodex::DrawWin(Vei2(254, 192), gfx);
+	if (GameWon()) {
+		SpriteCodex::DrawWin(gfx.GetRect().GetCenter(), gfx);
 	}
 }
 
@@ -179,22 +179,10 @@ void MemeField::OnRevealClick( const Vei2& screenPos )
 			if( tile.HasMeme() )
 			{
 				isFucked = true;
+				LostSound.Play();
 			}
 		}
-		bool continueGame = false;
-		for (Vei2 gridPos = { 0,0 }; gridPos.y < height; gridPos.y++)
-		{
-			for (gridPos.x = 0; gridPos.x < width; gridPos.x++)
-			{
-				if (!TileAt(gridPos).HasMeme())
-				{
-					continueGame = true;
-				}
-			}
-		}
-		if (!continueGame) {
-			gameWin = true;
-		}
+		
 	}
 }
 
@@ -247,4 +235,16 @@ int MemeField::CountNeighborMemes( const Vei2 & gridPos )
 	}
 
 	return count;
+}
+
+bool MemeField::GameWon() const
+{
+	for (const Tile& t : field)
+	{
+		if ((t.HasMeme() && !t.IsFlagged())||!t.HasMeme() && !t.IsRevealed())
+		{
+			return false;
+		}
+	}
+	return true;
 }
